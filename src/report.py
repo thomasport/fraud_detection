@@ -47,12 +47,12 @@ def bin_var(data: pd.DataFrame, col: str, n_bins=10) -> Styler:
     df[col_binned] = pd.qcut(df[col], q=n_bins)
     df_agg = (
         df.groupby(col_binned, observed=False)
-        .agg(count=(col, "count"), bad=("Class", "sum"))
+        .agg(count=(col, "count"), event=("Class", "sum"))
         .reset_index()
     )
-    df_agg["bad_rate"] = df_agg.bad / df_agg["count"]
-    df_agg["bad_distr"] = df_agg.bad / df_agg.bad.sum()
+    df_agg["event_rate"] = (df_agg.event / df_agg["count"])*100
+    df_agg["event_distr"] = (df_agg.event / df_agg.event.sum())*100
     view = df_agg.style.background_gradient(
-        subset=["bad_rate", "bad_distr"], cmap=cmap, vmax=1
-    )
+        subset=["event_rate", "event_distr"], cmap=cmap, vmax=100
+    ).format("{:.3f}%",subset=["event_rate", "event_distr"])
     return view
